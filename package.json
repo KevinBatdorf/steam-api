@@ -4,10 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "npx prisma generate && npx prisma migrate deploy && next build",
+        "build": "npx prisma generate && npx prisma migrate deploy && next build && curl -sX GET https://steam-search.vercel.app/api/games > /dev/null",
         "start": "next start",
-        "lint": "next lint",
-        "vercel-build": "curl -sX GET https://steam-search.vercel.app/api/games > /dev/null"
+        "lint": "next lint"
     },
     "prisma": {
         "seed": "ts-node ./prisma/seed.ts"
