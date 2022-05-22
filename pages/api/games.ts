@@ -1,7 +1,11 @@
 import Fuse from 'fuse.js'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Game } from '@prisma/client'
 import { prisma } from '../../lib/prisma'
+
+type Game = {
+    appid: number
+    name: string
+}
 
 const games: Game[] = []
 const searchCache = new Map<string, Game[]>()
