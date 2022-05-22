@@ -2,15 +2,16 @@ import type { NextRequest } from 'next/server'
 
 const game = new Map()
 
-const fetcher = async (appId: string) => {
+const fetcher = async (appId: string): Promise<any> => {
     try {
         const response = await fetch(
             `https://store.steampowered.com/api/appdetails?appids=${appId}`,
         )
         return await response.json()
     } catch (error) {
-        console.error(error)
-        return null
+        console.log({ error })
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        return fetcher(appId)
     }
 }
 
@@ -28,11 +29,7 @@ export async function middleware(req: NextRequest) {
         })
     }
     let data = await fetcher(appId)
-    console.log({ data })
-    // if success is false, try again (seems to fail sometimes, but not often)
-    if (!data?.[appId]?.success) {
-        data = await fetcher(appId)
-    }
+    console.log({ d: data })
 
     if (data?.[appId]?.success) {
         game.set(appId, data?.[appId]?.data)
