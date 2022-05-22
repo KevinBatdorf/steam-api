@@ -1,13 +1,19 @@
 import Fuse from 'fuse.js'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from './_prisma'
+import { prisma } from '../../lib/prisma'
 
 type Game = {
     appid: number
     name: string
 }
 
-const games: Game[] = []
+// Get gamedata from local json file if it exists
+let games: Game[]
+try {
+    games = require('./_games.json')
+} catch (e) {
+    games = []
+}
 const searchCache = new Map<string, Game[]>()
 
 export default async function handler(
@@ -26,6 +32,8 @@ export default async function handler(
     if (!games.length) {
         // sqlite in prisma can't do a fuzzy search, so just
         // keep these in memory: https://github.com/prisma/prisma/issues/9414
+        // This also won't run in production as we convert it to a JSON file
+        // to use serverless functions in Vercel
         const allGames = await prisma.game.findMany()
         allGames.forEach((g: Game) => games.push(g))
     }
