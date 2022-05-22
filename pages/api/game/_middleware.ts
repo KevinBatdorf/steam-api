@@ -32,8 +32,9 @@ export async function middleware(req: NextRequest) {
         setTimeout(() => game.delete(appId), 5 * 60 * 1000) // 5 minutes
     }
 
-    const response = data?.[appId]?.data ?? { error: { message: 'Not found' } }
-    console.log(response)
+    let response = data?.[appId]?.data
+    if (!response) response = { error: { message: 'Not found' } }
+
     return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
