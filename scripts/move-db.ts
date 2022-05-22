@@ -1,5 +1,8 @@
-import { copyFileSync } from 'fs'
+import { copyFile } from 'fs'
 import { join } from 'path'
 
 // move db file
-copyFileSync(join(__dirname, '../prisma/games.db'), '.')
+copyFile(join(__dirname, '../prisma/games.db'), '.', (err) => {
+    if (err) throw err
+    console.log('db file moved')
+})
