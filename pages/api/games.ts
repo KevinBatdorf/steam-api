@@ -1,3 +1,4 @@
+import { existsSync } from 'fs'
 import Fuse from 'fuse.js'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../lib/prisma'
@@ -8,12 +9,10 @@ type Game = {
 }
 
 // Get gamedata from local json file if it exists
-let games: Game[]
-try {
-    games = require('./_games.json')
-} catch (e) {
-    games = []
-}
+let games: Game[] =
+    process.env.NODE_ENV === 'production' && existsSync('./_games.json')
+        ? require('./_games.json')
+        : []
 const searchCache = new Map<string, Game[]>()
 
 export default async function handler(
