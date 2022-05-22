@@ -1,19 +1,16 @@
 # Steam API Search
 
-TODO:
-It seems the API game data endpoint is blocking Vercel IPs or something. The response is always empty when deployed, but is fine locally. Oddly enough, the all games endpoint works fine.
-Another option is to seed an sqlite db in a GH action to use instead. Seeding once a day seems reasonable. And keep the basic edge function caching to keep the requests fast.
-
-## Search and data
+## Search game appids
 
 Get all games by search term:
 ```
 /api/games?search=cyperpunk2077
 ```
+## Game data
+Note: To get data about a game, send a get request using the appid returned above to the following. This endpoint is rate limited though and abusing it may get you banned:
 
-Get game data by Steam appId (get it from the above request)
 ```
-/api/game?appId=1091500
+https://store.steampowered.com/api/appdetails?appids=${appid}
 ```
 
 ## Vercel
