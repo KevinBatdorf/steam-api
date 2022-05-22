@@ -7,6 +7,10 @@ const fetcher = async (appId: string): Promise<any> => {
         const response = await fetch(
             `https://store.steampowered.com/api/appdetails?appids=${appId}`,
         )
+        console.log(
+            `https://store.steampowered.com/api/appdetails?appids=${appId}`,
+        )
+        console.log({ response })
         return await response.json()
     } catch (error) {
         console.log({ error })
