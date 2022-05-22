@@ -1,0 +1,30 @@
+name: Seed and deploy
+on:
+  workflow_dispatch:
+  # schedule:
+  # At 08:00 daily
+  # - cron: "0 8 * * *"
+jobs:
+    seed:
+        name: Seed and deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v2
+            - name: Set up git user
+              run: git config --global user.name kevin
+            - name: Set up git email
+              run: git config --global user.name kevin@users.noreply.github.com
+            - name: Set up and seed
+              run: |
+                  npm ci --only=dev
+                  npx prisma migrate reset --force
+              env:
+                  CI: true
+            - name: Update main to trigger external deploy
+              run: git commit -am 'Update data'
+            - name: Push changed files to main
+              uses: ad-m/github-push-action@master
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                branch: main
