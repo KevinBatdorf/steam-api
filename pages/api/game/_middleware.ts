@@ -2,29 +2,22 @@ import type { NextRequest } from 'next/server'
 
 const game = new Map()
 
-const fetcher = async (appId: string): Promise<any> => {
+const fetcher = async (appId: string) => {
     try {
         const response = await fetch(
             `https://store.steampowered.com/api/appdetails?appids=${appId}`,
         )
-        console.log(
-            `https://store.steampowered.com/api/appdetails?appids=${appId}`,
-        )
-        console.log({ response })
         return await response.json()
     } catch (error) {
-        console.log({ error })
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        return fetcher(appId)
+        console.error(error)
     }
 }
 
 export async function middleware(req: NextRequest) {
     const appId = req.nextUrl.searchParams.get('appId')
-    console.log({ appId })
     if (!appId) return new Response(JSON.stringify({}), { status: 400 })
+
     if (game.has(appId)) {
-        console.log({ cached: true, g: game.get(appId) })
         return new Response(JSON.stringify(game.get(appId)), {
             status: 200,
             headers: {
@@ -33,7 +26,6 @@ export async function middleware(req: NextRequest) {
         })
     }
     let data = await fetcher(appId)
-    console.log({ d: data })
 
     if (data?.[appId]?.success) {
         game.set(appId, data?.[appId]?.data)
