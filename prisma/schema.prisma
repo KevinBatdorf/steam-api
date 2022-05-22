@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    url      = "file:./games.db"
+    url      = "file:../pages/api/_games.db"
 }
 
 model Game {
