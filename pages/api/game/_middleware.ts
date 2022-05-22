@@ -9,6 +9,7 @@ const fetcher = async (appId: string) => {
         )
         return await response.json()
     } catch (error) {
+        console.error(error)
         return null
     }
 }
