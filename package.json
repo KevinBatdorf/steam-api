@@ -7,7 +7,7 @@
         "build": "npx prisma generate && npx prisma migrate deploy && next build",
         "start": "next start",
         "lint": "next lint",
-        "vercel-build": "sqlite3 --json prisma/games.db \"select * from Game\" > pages/api/_games.json"
+        "vercel-build": "sqlite3 -version && sqlite3 --json prisma/games.db \"select * from Game\" > pages/api/_games.json"
     },
     "prisma": {
         "seed": "ts-node ./prisma/seed.ts"
