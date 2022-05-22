@@ -1,5 +1,9 @@
 # Steam API Search
 
+TODO:
+It seems the API game data endpoint is blocking Vercel IPs or something. The response is always empty when deployed, but is fine locally. Oddly enough, the all games endpoint works fine.
+Another option is to seed an sqlite db in a GH action to use instead. Seeding once a day seems reasonable. And keep the basic edge function caching to keep the requests fast.
+
 ## Search and data
 
 Get all games by search term:
