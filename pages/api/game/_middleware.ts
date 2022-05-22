@@ -3,10 +3,14 @@ import type { NextRequest } from 'next/server'
 const game = new Map()
 
 const fetcher = async (appId: string) => {
-    const response = await fetch(
-        `https://store.steampowered.com/api/appdetails?appids=${appId}`,
-    )
-    return await response.json()
+    try {
+        const response = await fetch(
+            `https://store.steampowered.com/api/appdetails?appids=${appId}`,
+        )
+        return await response.json()
+    } catch (error) {
+        return null
+    }
 }
 
 export async function middleware(req: NextRequest) {
