@@ -11,7 +11,7 @@ const fetcher = async (appId: string) => {
 
 export async function middleware(req: NextRequest) {
     const appId = req.nextUrl.searchParams.get('appId')
-    if (!appId) return new Response('', { status: 400 })
+    if (!appId) return new Response(JSON.stringify('{}'), { status: 400 })
 
     if (game.has(appId)) {
         return new Response(JSON.stringify(game.get(appId)), {
@@ -33,6 +33,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const response = data?.[appId]?.data ?? { error: { message: 'Not found' } }
+    console.log(response)
     return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
