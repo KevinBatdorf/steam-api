@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    url      = "file:../../prisma/games.db"
+    url      = "file:./games.db"
 }
 
 model Game {

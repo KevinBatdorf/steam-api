@@ -6,7 +6,8 @@
         "dev": "next dev",
         "build": "npx prisma generate && npx prisma migrate deploy && next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "vercel-build": "ts-node ./scripts/move-db.ts"
     },
     "prisma": {
         "seed": "ts-node ./prisma/seed.ts"
