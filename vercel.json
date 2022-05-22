@@ -1,6 +1,6 @@
 {
     "functions": {
-        "*": {
+        "pages/api/games.ts": {
             "includeFiles": "prisma/**"
         }
     }
