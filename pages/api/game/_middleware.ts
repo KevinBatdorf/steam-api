@@ -11,9 +11,10 @@ const fetcher = async (appId: string) => {
 
 export async function middleware(req: NextRequest) {
     const appId = req.nextUrl.searchParams.get('appId')
-    if (!appId) return new Response(JSON.stringify('{}'), { status: 400 })
-
+    if (!appId) return new Response(JSON.stringify({}), { status: 400 })
+    console.log({ appId })
     if (game.has(appId)) {
+        console.log({ cached: true, g: game.get(appId) })
         return new Response(JSON.stringify(game.get(appId)), {
             status: 200,
             headers: {
@@ -22,6 +23,7 @@ export async function middleware(req: NextRequest) {
         })
     }
     let data = await fetcher(appId)
+    console.log({ data })
     // if success is false, try again (seems to fail sometimes, but not often)
     if (!data?.[appId]?.success) {
         data = await fetcher(appId)
