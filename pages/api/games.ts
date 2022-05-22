@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../lib/prisma'
+import { prisma } from './_prisma'
 
 type Game = {
     appid: number
