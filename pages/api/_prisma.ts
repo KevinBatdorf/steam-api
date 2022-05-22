@@ -12,7 +12,7 @@ const options =
         ? {
               datasources: {
                   db: {
-                      url: `file:${join(__dirname, '_games.db')}`,
+                      url: `file:${join(__dirname, 'games.db')}`,
                   },
               },
           }
