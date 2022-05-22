@@ -37,9 +37,8 @@ export default async function handler(
 
     // If no results, just return 30 random games
     if (!results.length) {
-        const max = Math.floor(Math.random() * games.length) - 31
-        const randomStart = Math.max(0, max)
-        results = games.slice(randomStart, randomStart + 30)
+        const shuffled = games.sort(() => 0.5 - Math.random())
+        results = shuffled.slice(0, 30)
     }
 
     return res.status(200).json(results)
