@@ -27,7 +27,7 @@ export default async function handler(
         // sqlite in prisma can't do a fuzzy search, so just
         // keep these in memory: https://github.com/prisma/prisma/issues/9414
         const allGames = await prisma.game.findMany()
-        allGames.forEach((g) => games.push(g))
+        allGames.forEach((g: Game) => games.push(g))
     }
 
     let results: Game[] = []
