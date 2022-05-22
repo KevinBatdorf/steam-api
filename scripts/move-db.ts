@@ -1,8 +1,11 @@
-import { copyFile } from 'fs'
+import { writeFile, readFile } from 'fs'
 import { join } from 'path'
 
 // move db file
-copyFile(join(__dirname, '../prisma/games.db'), '.', (err) => {
+readFile(join(__dirname, 'games.db'), (err, data) => {
     if (err) throw err
-    console.log('db file moved')
+    writeFile('games.db', data, (err) => {
+        if (err) throw err
+        console.log('db file moved')
+    })
 })
