@@ -19,7 +19,7 @@ jobs:
               run: |
                   npm ci --only=dev
                   npx prisma migrate reset --force
-                  sqlite3 -version && sqlite3 --json prisma/games.db \"select * from Game\" > pages/api/_games.json
+                  sqlite3 -version && sqlite3 --json prisma/games.db "select * from Game" > pages/api/_games.json
               env:
                   CI: true
             - name: Update main branch
