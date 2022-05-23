@@ -2,9 +2,14 @@
 
 ## Search game appids
 
-Get all games by search term:
+Get all games by search term ([See it](https://steam-search.vercel.app/api/games?search=cyperpunk2077))
 ```
 /api/games?search=cyperpunk2077
+```
+
+Get a random 30 games ([See it](https://steam-search.vercel.app/api/games))
+```
+/api/games
 ```
 ## Game data
 Note: To get data about a game, send a get request using the appid returned above to the following. This endpoint is rate limited though and abusing it may get you banned:
