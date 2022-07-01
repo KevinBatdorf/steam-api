@@ -24,7 +24,7 @@
         "@types/react": "18.0.9",
         "@types/react-dom": "18.0.4",
         "eslint": "8.16.0",
-        "eslint-config-next": "12.1.6",
+        "eslint-config-next": "12.2.0",
         "prettier": "^2.6.2",
         "prisma": "^3.14.0",
         "ts-node": "^10.8.0",
