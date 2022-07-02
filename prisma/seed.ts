@@ -16,7 +16,7 @@ const fire = async () => {
 
     // Update in chunks to avoid heap overflow
     const chunks = gamesList.reduce((acc, game, index) => {
-        const chunkIndex = Math.floor(index / 200)
+        const chunkIndex = Math.floor(index / 100)
         if (!acc?.[chunkIndex]) {
             acc[chunkIndex] = []
         }
