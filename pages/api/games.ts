@@ -22,26 +22,42 @@ export default async function handler(
     }
 
     let results: Game[] = []
-    if (search) {
-        results = await prisma.game.findMany({
-            where: { name: { search } },
+
+    // If a number is coming in, search the appid
+    if (Number.isInteger(Number(search))) {
+        const game = await prisma.game.findUnique({
+            where: { appid: Number(search) },
         })
-        results = await prisma.$queryRaw`
-            SELECT distinct appid, name, similarity(name, ${search}) as score
+        // add to results if it exists
+        if (game) results.push(game)
+    }
+
+    if ((search?.length ?? 0) > 2) {
+        if (!search) return
+        const games = await prisma.$queryRaw`
+            SELECT appid, name, similarity(name, ${search}) as score
             FROM public."Game"
             WHERE name % ${search}
             order by score desc
-            limit 30;
+            limit 50;
         `
-        searchCache.set(search, results)
+        if (Array.isArray(games)) results.push(...games)
+    } else if (search?.length) {
+        // Searching 1 or 2 chars do startswith type search
+        const games = await prisma.game.findMany({
+            where: { name: { startsWith: search } },
+        })
+        if (Array.isArray(games)) results.push(...games)
     }
 
     // If no results, just return 30 random games
-    if (!results.length) {
+    if (results.length === 0) {
         results = await prisma.$queryRawUnsafe(
             `SELECT * FROM "Game" ORDER BY RANDOM() LIMIT 30;`,
         )
     }
 
+    // set cache
+    if (search) searchCache.set(search, results)
     return res.status(200).json(results)
 }
