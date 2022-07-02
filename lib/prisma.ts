@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { join } from 'path'
 
 declare global {
     // allow global `var` declarations

@@ -11,21 +11,9 @@ jobs:
         steps:
             - name: Check out code
               uses: actions/checkout@v2
-            - name: Set up git user
-              run: git config --global user.name kevin
-            - name: Set up git email
-              run: git config --global user.name kevin@users.noreply.github.com
             - name: Set up and seed
               run: |
                   npm ci --only=dev
                   npx prisma db seed
-                  sqlite3 -version && sqlite3 --json prisma/games.db "select * from Game" > pages/api/_games.json
               env:
                   CI: true
-            - name: Update main branch
-              run: git commit -am 'Update data'
-            - name: Push changed files to main
-              uses: ad-m/github-push-action@master
-              with:
-                github_token: ${{ secrets.GITHUB_TOKEN }}
-                branch: main
