@@ -12,39 +12,20 @@ const fire = async () => {
     const games = await fetcher(
         'https://api.steampowered.com/ISteamApps/GetAppList/v2?json=1',
     )
-    const gamesList: Game[] = games.applist.apps
-
-    // Update in chunks to avoid heap overflow
-    const chunks = gamesList.reduce((acc, game, index) => {
-        const chunkIndex = Math.floor(index / 100)
-        if (!acc?.[chunkIndex]) {
-            acc[chunkIndex] = []
-        }
-        acc[chunkIndex].push(game)
-        return acc
-    }, [] as Game[][])
-
-    let index = 1
-    for (const chunk of chunks) {
-        console.log(
-            `Inserting ${chunk.length * index} games of ${gamesList.length}`,
-            `(${gamesList.length - chunk.length * index} remaining)`,
-        )
-        await Promise.all(
-            chunk.map((game) => {
-                if (!game.name || game.appid < 10) {
-                    return Promise.resolve()
-                }
-                const { appid, name } = game
-                return prisma.game.upsert({
-                    where: { appid },
-                    update: { name },
-                    create: { appid, name },
-                })
-            }),
-        )
-        index++
+    if (!games.applist.apps) {
+        throw new Error('No games returned')
     }
+
+    // It doesn't look like prisma has upsertMany
+    await usingChunks(games.applist.apps, async (games: Game[]) => {
+        for (const game of games) {
+            await prisma.game.upsert({
+                where: { appid: game.appid },
+                update: { name: game.name },
+                create: { appid: game.appid, name: game.name },
+            })
+        }
+    })
 }
 
 fire()
@@ -55,3 +36,14 @@ fire()
     .finally(async () => {
         await prisma.$disconnect()
     })
+
+const usingChunks = async (items: Game[], callback: Function) => {
+    const chunkSize = Number(process.env.CHUNK_SIZE) || 1000
+    const writeDelay = Number(process.env.WRITE_DELAY) || 100
+    let temporary
+    for (let i = 0; i < items.length; i += chunkSize) {
+        temporary = items.slice(i, i + chunkSize)
+        callback(temporary)
+        await new Promise((resolve) => setTimeout(resolve, writeDelay))
+    }
+}
