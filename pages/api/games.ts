@@ -65,6 +65,12 @@ export default async function handler(
         )
     }
 
+    // filter out any duplicates that may have been returned
+    results = results.filter(
+        (item, index, self) =>
+            self.findIndex((t) => t.appid === item.appid) === index,
+    )
+
     // set cache
     if (search) searchCache.set(search, results)
     return res.status(200).json(results)
