@@ -64,8 +64,6 @@ export default async function handler(
         if (Array.isArray(games)) results.push(...games)
     }
 
-    console.log(`Found ${results.length} results`)
-
     // If no results, just return 30 random games
     if (results.length === 0 && !search?.length) {
         results = await prisma.$queryRawUnsafe(
