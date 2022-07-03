@@ -46,7 +46,7 @@ export default async function handler(
             FROM public."Game"
             WHERE name % ${search}
         )
-        order by score desc
+        order by score desc, name
         limit 50;
         `
         if (Array.isArray(games)) results.push(...games)
