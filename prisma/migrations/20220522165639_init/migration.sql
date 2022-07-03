@@ -1,5 +1,0 @@
--- CreateTable
-CREATE TABLE "Game" (
-    "appid" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL
-);
