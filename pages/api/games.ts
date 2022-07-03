@@ -38,6 +38,12 @@ export default async function handler(
         (
             SELECT appid, name, 1 as score
             FROM public."Game"
+            WHERE name ILIKE ${search} || '%'
+        )
+        UNION ALL
+        (
+            SELECT appid, name, 0.99 as score
+            FROM public."Game"
             WHERE name ILIKE '%' || ${search} || '%'
         )
         UNION ALL
@@ -47,7 +53,7 @@ export default async function handler(
             WHERE name % ${search}
         )
         order by score desc, name
-        limit 50;
+        limit 100;
         `
         if (Array.isArray(games)) results.push(...games)
     } else if (search?.length) {
@@ -57,6 +63,8 @@ export default async function handler(
         })
         if (Array.isArray(games)) results.push(...games)
     }
+
+    console.log(`Found ${results.length} results`)
 
     // If no results, just return 30 random games
     if (results.length === 0 && !search?.length) {
