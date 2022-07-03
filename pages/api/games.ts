@@ -35,11 +35,19 @@ export default async function handler(
     if ((search?.length ?? 0) > 2) {
         if (!search) return
         const games = await prisma.$queryRaw`
+        (
+            SELECT appid, name, 1 as score
+            FROM public."Game"
+            WHERE name ILIKE '%' || ${search} || '%'
+        )
+        UNION ALL
+        (
             SELECT appid, name, similarity(name, ${search}) as score
             FROM public."Game"
             WHERE name % ${search}
-            order by score desc
-            limit 50;
+        )
+        order by score desc
+        limit 50;
         `
         if (Array.isArray(games)) results.push(...games)
     } else if (search?.length) {
@@ -51,7 +59,7 @@ export default async function handler(
     }
 
     // If no results, just return 30 random games
-    if (results.length === 0) {
+    if (results.length === 0 && !search?.length) {
         results = await prisma.$queryRawUnsafe(
             `SELECT * FROM "Game" ORDER BY RANDOM() LIMIT 30;`,
         )
