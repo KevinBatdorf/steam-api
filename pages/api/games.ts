@@ -6,8 +6,6 @@ type Game = {
     name: string
 }
 
-const searchCache = new Map<string, Game[]>()
-
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
@@ -15,10 +13,6 @@ export default async function handler(
     const search = req.query?.search?.toString()
     if (req.method !== 'GET') {
         return res.status(200).json([])
-    }
-
-    if (search && searchCache.has(search)) {
-        return res.status(200).json(searchCache.get(search))
     }
 
     let results: Game[] = []
@@ -77,7 +71,5 @@ export default async function handler(
             self.findIndex((t) => t.appid === item.appid) === index,
     )
 
-    // set cache
-    if (search) searchCache.set(search, results)
     return res.status(200).json(results)
 }
