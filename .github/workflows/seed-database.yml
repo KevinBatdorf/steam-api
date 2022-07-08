@@ -2,8 +2,8 @@ name: Seed and deploy
 on:
   workflow_dispatch:
   schedule:
-  # At 08:00 daily
-  - cron: "0 8 * * *"
+  # At 04:00pm daily
+  - cron: "0 16 * * *"
 jobs:
     seed:
         name: Seed and deploy
