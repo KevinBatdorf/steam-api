@@ -53,9 +53,14 @@ export default async function handler(
     } else if (search?.length) {
         // Searching 1 or 2 chars do startswith type search
         const games = await prisma.game.findMany({
-            where: { name: { startsWith: search } },
+            where: {
+                name: {
+                    startsWith: search,
+                    mode: 'insensitive',
+                },
+            },
         })
-        if (Array.isArray(games)) results.push(...games)
+        if (Array.isArray(games)) results.push(...games.slice(0, 100))
     }
 
     // If no results, just return 30 random games
