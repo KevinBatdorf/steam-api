@@ -17,15 +17,17 @@ const fire = async () => {
     }
 
     // It doesn't look like prisma has upsertMany
-    await usingChunks(games.applist.apps, async (games: Game[]) => {
-        for (const game of games) {
-            await prisma.game.upsert({
-                where: { appid: game.appid },
-                update: { name: game.name },
-                create: { appid: game.appid, name: game.name },
-            })
-        }
-    })
+    await usingChunks(games.applist.apps, (games: Game[]) =>
+        prisma.$transaction(
+            games.map((game) =>
+                prisma.game.upsert({
+                    where: { appid: game.appid },
+                    update: { name: game.name },
+                    create: { appid: game.appid, name: game.name },
+                }),
+            ),
+        ),
+    )
 }
 
 fire()
@@ -43,7 +45,8 @@ const usingChunks = async (items: Game[], callback: Function) => {
     let temporary
     for (let i = 0; i < items.length; i += chunkSize) {
         temporary = items.slice(i, i + chunkSize)
-        callback(temporary)
+        await callback(temporary)
+        console.log('going...')
         await new Promise((resolve) => setTimeout(resolve, writeDelay))
     }
 }
