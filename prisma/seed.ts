@@ -18,8 +18,8 @@ const fire = async () => {
 
     // It doesn't look like prisma has upsertMany
     await usingChunks(games.applist.apps, (games: Game[]) =>
-        prisma.$transaction(
-            games.map((game) =>
+        Promise.all(
+            games.map((game: Game) =>
                 prisma.game.upsert({
                     where: { appid: game.appid },
                     update: { name: game.name },
@@ -40,7 +40,7 @@ fire()
     })
 
 const usingChunks = async (items: Game[], callback: Function) => {
-    const chunkSize = Number(process.env.CHUNK_SIZE) || 1000
+    const chunkSize = Number(process.env.CHUNK_SIZE) || 3000
     const writeDelay = Number(process.env.WRITE_DELAY) || 100
     let temporary
     for (let i = 0; i < items.length; i += chunkSize) {
