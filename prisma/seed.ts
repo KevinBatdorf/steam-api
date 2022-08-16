@@ -46,9 +46,9 @@ const usingChunks = async (items: Game[], callback: Function) => {
     for (let i = 0; i < items.length; i += chunkSize) {
         temporary = items.slice(i, i + chunkSize)
         console.log(
-            `Processing batch ${Math.floor(i / chunkSize) + 1} of ${Math.floor(
-                items.length / chunkSize,
-            )}`,
+            `Processing batch ${Math.floor(i / chunkSize) + 1} of ${
+                Math.floor(items.length / chunkSize) + 1
+            }`,
         )
         await callback(temporary)
         await new Promise((resolve) => setTimeout(resolve, writeDelay))
