@@ -18,7 +18,7 @@ const fire = async () => {
 
     // It doesn't look like prisma has upsertMany
     await usingChunks(games.applist.apps, (games: Game[]) =>
-        Promise.all(
+        prisma.$transaction(
             games.map((game: Game) =>
                 prisma.game.upsert({
                     where: { appid: game.appid },
