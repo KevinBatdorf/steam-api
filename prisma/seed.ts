@@ -17,17 +17,15 @@ const fire = async () => {
     }
 
     // It doesn't look like prisma has upsertMany
-    await usingChunks(games.applist.apps, (games: Game[]) =>
-        prisma.$transaction(
-            games.map((game: Game) =>
-                prisma.game.upsert({
-                    where: { appid: game.appid },
-                    update: { name: game.name },
-                    create: { appid: game.appid, name: game.name },
-                }),
-            ),
-        ),
-    )
+    await usingChunks(games.applist.apps, async (games: Game[]) => {
+        for (const game of games) {
+            await prisma.game.upsert({
+                where: { appid: game.appid },
+                update: { name: game.name },
+                create: { appid: game.appid, name: game.name },
+            })
+        }
+    })
 }
 
 fire()
