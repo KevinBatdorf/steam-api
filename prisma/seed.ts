@@ -48,7 +48,9 @@ const usingChunks = async (items: Game[], callback: Function) => {
                 Math.floor(items.length / chunkSize) + 1
             }`,
         )
-        await callback(temporary)
+        // await callback(temporary)
+        // Appears to run more consistently without await
+        callback(temporary)
         await new Promise((resolve) => setTimeout(resolve, writeDelay))
     }
 }
