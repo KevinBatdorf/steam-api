@@ -21,7 +21,7 @@ jobs:
                   CHUNK_SIZE: ${{ secrets.CHUNK_SIZE }}
                   WRITE_DELAY: ${{ secrets.WRITE_DELAY }}
             - name: Trigger re-deployment
-              uses: fjogeleit/http-request-action@master
+              uses: fjogeleit/http-request-action@v1
               with:
                   url: ${{ secrets.DEPLOY_WEBHOOK }}
                   method: 'POST'
