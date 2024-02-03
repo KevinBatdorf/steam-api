@@ -13,6 +13,8 @@ datasource db {
 }
 
 model Game {
-    appid Int    @id
-    name  String
+    appid     Int      @id
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+    name      String
 }
