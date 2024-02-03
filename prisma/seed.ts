@@ -15,17 +15,22 @@ const fire = async () => {
     if (!games.applist.apps) {
         throw new Error('No games returned')
     }
+    console.log(`Fetched ${games.applist.apps.length} games`)
 
     // It doesn't look like prisma has upsertMany
     await usingChunks(games.applist.apps, async (games: Game[]) => {
-        for (const game of games) {
-            prisma.game.upsert({
-                where: { appid: game.appid },
-                update: { name: game.name },
-                create: { appid: game.appid, name: game.name },
-            })
-        }
+        await Promise.all(
+            games.map((game) =>
+                prisma.game.upsert({
+                    where: { appid: game.appid },
+                    update: { name: game.name },
+                    create: { appid: game.appid, name: game.name },
+                }),
+            ),
+        )
     })
+    // Query to check if the games were inserted
+    console.log(`There are ${await prisma.game.count()} games in the database`)
 }
 
 fire()
@@ -48,9 +53,7 @@ const usingChunks = async (items: Game[], callback: Function) => {
                 Math.floor(items.length / chunkSize) + 1
             }`,
         )
-        // await callback(temporary)
-        // Appears to run more consistently without await
-        callback(temporary)
+        await callback(temporary)
         await new Promise((resolve) => setTimeout(resolve, writeDelay))
     }
 }
