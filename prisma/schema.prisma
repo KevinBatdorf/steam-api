@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-    provider = "postgres"
-    url      = env("PRISMA_DB")
+    provider  = "postgres"
+    url       = env("PRISMA_DB")
+    directUrl = env("PRISMA_DB_DIRECT")
 }
 
 model Game {
