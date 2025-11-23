@@ -8,29 +8,43 @@ type Game = {
     name: string
 }
 
-const fire = async () => {
-    const games = await fetcher(
-        'https://api.steampowered.com/ISteamApps/GetAppList/v2?json=1',
+const key = process.env.STEAM_KEY
+
+const fire = async (lastId = 0) => {
+    const url = new URL(
+        `https://api.steampowered.com/IStoreService/GetAppList/v1?key=${key}&json=1&max_results=1000`,
     )
-    if (!games.applist.apps) {
+    if (lastId) {
+        url.searchParams.append('last_appid', lastId.toString())
+    }
+    console.log(`Querying games with lastId: ${lastId}`)
+    const res = await fetcher(url.toString())
+    if (!res?.response) {
+        console.log(res)
         throw new Error('No games returned')
     }
-    console.log(`Fetched ${games.applist.apps.length} games`)
+    const games = res.response.apps
+    if (!Array.isArray(games) || games.length === 0) {
+        console.log('No more games to fetch, exiting.')
+        return
+    }
 
-    // It doesn't look like prisma has upsertMany
-    await usingChunks(games.applist.apps, async (games: Game[]) => {
-        await Promise.all(
-            games.map((game) =>
-                prisma.game.upsert({
-                    where: { appid: game.appid },
-                    update: { name: game.name },
-                    create: { appid: game.appid, name: game.name },
-                }),
-            ),
-        )
-    })
-    // Query to check if the games were inserted
-    console.log(`There are ${await prisma.game.count()} games in the database`)
+    const theLastId = games.at(-1).appid
+    console.log(`Fetched ${games.length} games`)
+    console.log(`Found lastId: ${theLastId}`)
+
+    await Promise.all(
+        games.map((game) =>
+            prisma.game.upsert({
+                where: { appid: game.appid },
+                update: { name: game.name },
+                create: { appid: game.appid, name: game.name },
+            }),
+        ),
+    )
+    if (theLastId !== lastId) {
+        await fire(theLastId)
+    }
 }
 
 fire()
@@ -41,19 +55,3 @@ fire()
     .finally(async () => {
         await prisma.$disconnect()
     })
-
-const usingChunks = async (items: Game[], callback: Function) => {
-    const chunkSize = Number(process.env.CHUNK_SIZE) || 3000
-    const writeDelay = Number(process.env.WRITE_DELAY) || 100
-    let temporary
-    for (let i = 0; i < items.length; i += chunkSize) {
-        temporary = items.slice(i, i + chunkSize)
-        console.log(
-            `Processing batch ${Math.floor(i / chunkSize) + 1} of ${
-                Math.floor(items.length / chunkSize) + 1
-            }`,
-        )
-        callback(temporary)
-        await new Promise((resolve) => setTimeout(resolve, writeDelay))
-    }
-}
