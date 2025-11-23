@@ -20,6 +20,7 @@ jobs:
                   PRISMA_DB: ${{ secrets.PRISMA_DB }}
                   CHUNK_SIZE: ${{ secrets.CHUNK_SIZE }}
                   WRITE_DELAY: ${{ secrets.WRITE_DELAY }}
+                  STEAM_KEY: ${{ secrets.STEAM_KEY }}
             - name: Trigger re-deployment
               uses: fjogeleit/http-request-action@v1
               with:
