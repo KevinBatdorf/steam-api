@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { pool } from '../../lib/db'
+import { Hono } from 'hono'
+import { pool } from './lib/db'
 
 type Game = {
     appid: number
@@ -9,15 +9,10 @@ type Game = {
 const query = async (text: string, values?: unknown[]) =>
     (await pool.query<Game>(text, values)).rows
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse,
-) {
-    const search = req.query?.search?.toString()
-    if (req.method !== 'GET') {
-        return res.status(200).json([])
-    }
+const app = new Hono()
 
+app.get('/api/games', async (c) => {
+    const search = c.req.query('search')
     let results: Game[] = []
 
     // If a number is coming in, search the appid
@@ -76,5 +71,9 @@ export default async function handler(
             self.findIndex((t) => t.appid === item.appid) === index,
     )
 
-    return res.status(200).json(results)
-}
+    return c.json(results)
+})
+
+app.all('/api/games', (c) => c.json([]))
+
+export default app
