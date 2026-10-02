@@ -8,7 +8,8 @@
         "start": "next start",
         "lint": "next lint",
         "db:setup": "ts-node scripts/setup-db.ts",
-        "seed": "ts-node scripts/seed.ts"
+        "seed": "ts-node scripts/seed.ts",
+        "test": "vitest run"
     },
     "dependencies": {
         "next": "12.2.5",
@@ -25,6 +26,7 @@
         "eslint-config-next": "12.2.5",
         "prettier": "^2.7.1",
         "ts-node": "^10.9.1",
-        "typescript": "4.7.4"
+        "typescript": "4.7.4",
+        "vitest": "^3.2.7"
     }
 }

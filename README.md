@@ -33,3 +33,14 @@ https://store.steampowered.com/api/appdetails?appids=${appid}
 5. To refresh the list daily, add `DATABASE_URL` and `STEAM_KEY` as GitHub Actions secrets on your repo. `.github/workflows/seed-database.yml` runs the seed every day.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FKevinBatdorf%2Fsteam-api&env=DATABASE_URL)
+
+## Tests
+
+The tests need a local Postgres. They empty the `Game` table, so they refuse to run against anything but localhost.
+
+```
+docker run -d -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
+npm test
+```
+
+Set `TEST_DATABASE_URL` to use a different local database.
