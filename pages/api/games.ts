@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../lib/prisma'
+import { pool } from '../../lib/db'
 
 type Game = {
     appid: number
     name: string
 }
+
+const query = async (text: string, values?: unknown[]) =>
+    (await pool.query<Game>(text, values)).rows
 
 export default async function handler(
     req: NextApiRequest,
@@ -19,55 +22,52 @@ export default async function handler(
 
     // If a number is coming in, search the appid
     if (Number.isInteger(Number(search))) {
-        const game = await prisma.game.findUnique({
-            where: { appid: Number(search) },
-        })
-        // add to results if it exists
-        if (game) results.push(game)
+        results.push(
+            ...(await query('SELECT * FROM "Game" WHERE appid = $1', [
+                Number(search),
+            ])),
+        )
     }
 
-    if ((search?.length ?? 0) > 2) {
-        if (!search) return
-        const games = await prisma.$queryRaw`
-        (
-            SELECT appid, name, 1 as score
-            FROM public."Game"
-            WHERE name ILIKE ${search} || '%'
+    if (search && search.length > 2) {
+        const games = await query(
+            `
+            (
+                SELECT appid, name, 1 as score
+                FROM public."Game"
+                WHERE name ILIKE $1 || '%'
+            )
+            UNION ALL
+            (
+                SELECT appid, name, 0.99 as score
+                FROM public."Game"
+                WHERE name ILIKE '%' || $1 || '%'
+            )
+            UNION ALL
+            (
+                SELECT appid, name, similarity(name, $1) as score
+                FROM public."Game"
+                WHERE name % $1
+            )
+            order by score desc, name
+            limit 100;
+            `,
+            [search],
         )
-        UNION ALL
-        (
-            SELECT appid, name, 0.99 as score
-            FROM public."Game"
-            WHERE name ILIKE '%' || ${search} || '%'
-        )
-        UNION ALL
-        (
-            SELECT appid, name, similarity(name, ${search}) as score
-            FROM public."Game"
-            WHERE name % ${search}
-        )
-        order by score desc, name
-        limit 100;
-        `
-        if (Array.isArray(games)) results.push(...games)
+        results.push(...games)
     } else if (search?.length) {
         // Searching 1 or 2 chars do startswith type search
-        const games = await prisma.game.findMany({
-            where: {
-                name: {
-                    startsWith: search,
-                    mode: 'insensitive',
-                },
-            },
-        })
-        if (Array.isArray(games)) results.push(...games.slice(0, 100))
+        results.push(
+            ...(await query(
+                `SELECT * FROM "Game" WHERE name ILIKE $1 || '%' LIMIT 100`,
+                [search],
+            )),
+        )
     }
 
     // If no results, just return 30 random games
     if (results.length === 0 && !search?.length) {
-        results = await prisma.$queryRawUnsafe(
-            `SELECT * FROM "Game" ORDER BY RANDOM() LIMIT 30;`,
-        )
+        results = await query('SELECT * FROM "Game" ORDER BY RANDOM() LIMIT 30')
     }
 
     // filter out any duplicates that may have been returned

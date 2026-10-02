@@ -1,4 +1,4 @@
-name: Seed and deploy
+name: Seed database
 on:
   workflow_dispatch:
   schedule:
@@ -6,24 +6,15 @@ on:
   - cron: "0 16 * * *"
 jobs:
     seed:
-        name: Seed and deploy
+        name: Seed database
         runs-on: ubuntu-22.04
         steps:
             - name: Check out code
               uses: actions/checkout@v4
-            - name: Set up and seed
+            - name: Seed
               run: |
                   npm ci
-                  npx prisma db seed
+                  npm run seed
               env:
-                  CI: true
-                  PRISMA_DB: ${{ secrets.PRISMA_DB }}
-                  CHUNK_SIZE: ${{ secrets.CHUNK_SIZE }}
-                  WRITE_DELAY: ${{ secrets.WRITE_DELAY }}
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
                   STEAM_KEY: ${{ secrets.STEAM_KEY }}
-            - name: Trigger re-deployment
-              uses: fjogeleit/http-request-action@v1
-              with:
-                  url: ${{ secrets.DEPLOY_WEBHOOK }}
-                  method: 'POST'
-                  timeout: 30000
