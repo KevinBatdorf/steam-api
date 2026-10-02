@@ -25,9 +25,8 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: npm
             - run: npm ci
-            - run: npx tsc --noEmit
-            - run: npm run lint
+            - run: npm run typecheck
             - run: npm test
