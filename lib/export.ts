@@ -6,10 +6,12 @@ import { createGunzip, createGzip } from 'zlib'
 import { from as copyFrom, to as copyTo } from 'pg-copy-streams'
 import { pool } from './db'
 
-// A run takes about a minute, so an hour-old stamp means the app was missed
+// A run takes about a minute, so an hour-old stamp means the app was missed.
+// Apps last seen 2025-11-12 left our view when the seed changed Steam lists.
 const DELISTED = `
     SELECT appid, name, "updatedAt" AS last_listed FROM "Game"
-    WHERE "updatedAt" < (SELECT max("updatedAt") FROM "Game") - interval '1 hour'`
+    WHERE "updatedAt" < (SELECT max("updatedAt") FROM "Game") - interval '1 hour'
+        AND "updatedAt"::date <> '2025-11-12'`
 
 const EXPORTS = {
     'games.csv.gz': `SELECT appid, name, "createdAt" AS first_listed, "updatedAt" AS last_listed FROM "Game" ORDER BY appid`,
