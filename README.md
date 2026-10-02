@@ -18,14 +18,25 @@ Note: To get data about a game, send a get request using the appid returned abov
 https://store.steampowered.com/api/appdetails?appids=${appid}
 ```
 
+## Download the list
+
+The seed workflow publishes the whole list every day to the [`data` release](https://github.com/KevinBatdorf/steam-api/releases/tag/data):
+
+- [`games.csv.gz`](https://github.com/KevinBatdorf/steam-api/releases/download/data/games.csv.gz): every app this API has seen, with when Steam first and last listed it
+- [`delisted.csv.gz`](https://github.com/KevinBatdorf/steam-api/releases/download/data/delisted.csv.gz): apps Steam no longer lists
+- [`delisted-today.csv.gz`](https://github.com/KevinBatdorf/steam-api/releases/download/data/delisted-today.csv.gz): apps that disappeared since the previous day
+
+Steam's own app list drops delisted apps; this list keeps them.
+
 ## Run your own
 
 1. Create a Postgres database and copy its connection string.
-2. Create the table:
+2. Create the table and load the full list, including delisted apps:
     ```
     DATABASE_URL=postgres://... npm run db:setup
+    DATABASE_URL=postgres://... npm run db:import
     ```
-3. Get a Steam Web API key at https://steamcommunity.com/dev/apikey, then load the game list:
+3. Get a Steam Web API key at https://steamcommunity.com/dev/apikey, then add anything new:
     ```
     DATABASE_URL=postgres://... STEAM_KEY=... npm run seed
     ```

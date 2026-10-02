@@ -4,6 +4,8 @@ on:
   schedule:
   # At 04:00pm daily
   - cron: "0 16 * * *"
+permissions:
+    contents: write
 jobs:
     seed:
         name: Seed database
@@ -23,3 +25,14 @@ jobs:
               env:
                   DATABASE_URL: ${{ secrets.DATABASE_URL }}
                   STEAM_KEY: ${{ secrets.STEAM_KEY }}
+            - name: Export
+              run: npm run export
+              env:
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            - name: Publish to the data release
+              run: |
+                  gh release view data > /dev/null 2>&1 || gh release create data --title "Steam game list" --notes-file .github/data-release.md
+                  gh release edit data --notes-file .github/data-release.md
+                  gh release upload data export/*.csv.gz --clobber
+              env:
+                  GH_TOKEN: ${{ github.token }}

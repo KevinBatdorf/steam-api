@@ -7,16 +7,20 @@
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
         "db:setup": "tsx scripts/setup-db.ts",
-        "seed": "tsx scripts/seed.ts"
+        "seed": "tsx scripts/seed.ts",
+        "export": "tsx scripts/export.ts",
+        "db:import": "tsx scripts/import.ts"
     },
     "dependencies": {
         "hono": "^4.13.12",
-        "pg": "^8.23.1"
+        "pg": "^8.23.1",
+        "pg-copy-streams": "^7.0.0"
     },
     "devDependencies": {
         "@hono/node-server": "^2.1.3",
         "@types/node": "^22.20.5",
         "@types/pg": "^8.23.1",
+        "@types/pg-copy-streams": "^1.2.5",
         "prettier": "^2.7.1",
         "tsx": "^4.23.15",
         "typescript": "^5.9.3",
